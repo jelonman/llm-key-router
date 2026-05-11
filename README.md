@@ -41,7 +41,7 @@ client -> http://127.0.0.1:8080/v1/chat/completions -> provider/model/key router
 ## Install from source
 
 ```bash
-git clone https://github.com/YOUR_NAME/llm-key-router.git
+git clone https://github.com/jelonman/llm-key-router.git
 cd llm-key-router
 python -m venv .venv
 source .venv/bin/activate

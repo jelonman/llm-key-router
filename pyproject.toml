@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-key-router"
+version = "0.2.0"
+description = "Local usage-aware LLM key and model router for OpenAI-compatible tools."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [{name = "LLM Key Router Contributors"}]
+keywords = ["llm", "openrouter", "ollama", "proxy", "gateway", "router"]
+classifiers = ["Programming Language :: Python :: 3", "License :: OSI Approved :: Apache Software License"]
+
+[project.scripts]
+llm-key-router = "llm_key_router.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

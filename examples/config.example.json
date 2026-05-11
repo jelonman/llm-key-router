@@ -1,0 +1,124 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8080
+  },
+  "default_route": "or-minimax",
+  "allow_unknown_model_fallback": false,
+  "force_non_streaming": true,
+  "max_request_body_bytes": 20000000,
+  "log_requests": true,
+  "providers": {
+    "openrouter": {
+      "enabled": true,
+      "type": "openai_compatible",
+      "base_url": "https://openrouter.ai/api/v1",
+      "chat_completions_path": "/chat/completions",
+      "credential_strategy": "round_robin",
+      "daily_request_cap_per_credential": 1000,
+      "attempts_per_provider": 2,
+      "timeout_seconds": 180,
+      "model_failure_block_seconds": 30,
+      "max_model_block_seconds": 300,
+      "network_failure_block_seconds": 15,
+      "extra_headers": {
+        "HTTP-Referer": "http://127.0.0.1:8080",
+        "X-OpenRouter-Title": "LLM Key Router"
+      },
+      "credentials": [
+        {
+          "label": "openrouter_01",
+          "api_key_env": "OPENROUTER_KEY_01",
+          "enabled": true
+        },
+        {
+          "label": "openrouter_02",
+          "api_key_env": "OPENROUTER_KEY_02",
+          "enabled": true
+        }
+      ]
+    },
+    "ollama_cloud": {
+      "enabled": false,
+      "type": "ollama_native",
+      "base_url": "https://ollama.com",
+      "chat_path": "/api/chat",
+      "credential_strategy": "round_robin",
+      "timeout_seconds": 180,
+      "credentials": [
+        {
+          "label": "ollama_cloud_01",
+          "api_key_env": "OLLAMA_API_KEY_01",
+          "enabled": true
+        }
+      ]
+    },
+    "local_ollama": {
+      "enabled": false,
+      "type": "ollama_native",
+      "auth": "none",
+      "base_url": "http://127.0.0.1:11434",
+      "chat_path": "/api/chat",
+      "timeout_seconds": 240
+    },
+    "local_openai_compatible": {
+      "enabled": false,
+      "type": "openai_compatible",
+      "auth": "none",
+      "base_url": "http://127.0.0.1:8000/v1",
+      "chat_completions_path": "/chat/completions",
+      "timeout_seconds": 240
+    }
+  },
+  "routes": {
+    "or-minimax": {
+      "mode": "evaluation",
+      "targets": [
+        {
+          "provider": "openrouter",
+          "model": "minimax/minimax-m2.5:free",
+          "credential_attempts": 2
+        }
+      ]
+    },
+    "or-nemotron": {
+      "mode": "evaluation",
+      "targets": [
+        {
+          "provider": "openrouter",
+          "model": "nvidia/nemotron-3-super-120b-a12b:free",
+          "credential_attempts": 2
+        }
+      ]
+    },
+    "or-best-free": {
+      "mode": "production",
+      "targets": [
+        {
+          "provider": "openrouter",
+          "models": [
+            "minimax/minimax-m2.5:free",
+            "nvidia/nemotron-3-super-120b-a12b:free",
+            "inclusionai/ring-2.6-1t:free",
+            "openrouter/owl-alpha"
+          ],
+          "credential_attempts": 2,
+          "allow_fallbacks": true,
+          "provider_sort": {
+            "by": "throughput",
+            "partition": "none"
+          }
+        }
+      ]
+    },
+    "local-ollama": {
+      "mode": "production",
+      "targets": [
+        {
+          "provider": "local_ollama",
+          "model": "llama3.1"
+        }
+      ]
+    }
+  }
+}
